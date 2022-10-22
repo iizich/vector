@@ -1,10 +1,12 @@
-#include "src/vector.hpp"
 #include <iostream>
+#include <vector>
+#include "src/vector.hpp"
 
-int main(){
-    izich::vector<int> v {1,2,3,4,5};
-    auto it = v.begin();
-    it += 3;
-    std::cout << *it;
-    return 0;
+int main() {
+    std::vector<int> v {1,2,3,4,5,6};
+    std::cout << "v.cap = " << v.capacity() << std::endl;
+    std::cout << "v.size = " << v.size() << std::endl;
+    v.pop_back();
+    std::cout << "v.cap = " << v.capacity() << std::endl;
+    std::cout << "v.size = " << v.size() << std::endl;
 }

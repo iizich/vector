@@ -57,8 +57,9 @@ public:
     using iterator = Iterator<T>;
     using const_iterator = Iterator<const T>;
 public:
-    constexpr explicit vector() : capacity_(0), size_(0) {}
-    constexpr vector(std::initializer_list<T> il) : size_(il.size()), capacity_(il.size() * 2) {
+    constexpr explicit vector(allocator_type alloc = allocator_type())
+    : capacity_(0), size_(0) {}
+    constexpr vector(std::initializer_list<T> il) : size_(il.size()), capacity_(il.size()) {
         array_ = allocator_traits::allocate(allocator_, capacity_);
         size_t index = 0;
         for (auto it = il.begin(); it != il.end(); ++it, ++index) {
@@ -66,6 +67,16 @@ public:
         }
     }
 public:
+    value_type at(std::size_t i) const {
+        if(i >= size_) throw std::out_of_range("out of range");
+        return i;
+    }
+    value_type front() const noexcept {
+        return array_[0];
+    }
+    value_type back() const noexcept {
+        return array_[size_ - 1];
+    }
     void reserve(size_t n){
         if(capacity_ <= n) return;
         T* new_arr = allocator_traits::allocate(allocator_, n);
@@ -77,6 +88,27 @@ public:
         }
         capacity_ = n;
         array_ = new_arr;
+    }
+    void resize(std::size_t n){
+        if(n > capacity_) reserve(n * 2);
+        size_ = n;
+    }
+    void resize(std::size_t n, value_type init){
+        reserve(n);
+        for(size_t i = n; i < capacity_; ++i){
+            allocator_traits::construct(allocator_, array_ + i, init);
+        }
+    }
+    void push_back(const value_type& value){
+        if(size_ >= capacity_) {
+            reserve(size_ * 2);
+        }
+        allocator_traits::construct(allocator_, array_ + size_, value);
+        ++size_;
+    }
+    void pop_back(){
+        allocator_traits::destroy(allocator_, array_ + size_);
+        resize(size_ - 1);
     }
     [[nodiscard]] std::size_t capacity() const noexcept {
         return capacity_;
