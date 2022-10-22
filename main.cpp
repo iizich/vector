@@ -9,4 +9,6 @@ int main() {
     v.pop_back();
     std::cout << "v.cap = " << v.capacity() << std::endl;
     std::cout << "v.size = " << v.size() << std::endl;
+    std::cout << "v.front = " << v.front() << std::endl;
+    std::cout << "v.end = " << v.back() << std::endl;
 }

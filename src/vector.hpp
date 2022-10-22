@@ -72,10 +72,10 @@ public:
         return i;
     }
     value_type front() const noexcept {
-        return array_[0];
+        return *begin();
     }
     value_type back() const noexcept {
-        return array_[size_ - 1];
+        return *(end()--);
     }
     void reserve(size_t n){
         if(capacity_ <= n) return;
