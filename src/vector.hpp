@@ -1,48 +1,7 @@
 #pragma once
-#include <iterator>
+#include "vector_iterator.hpp"
 
 namespace izich {
-
-template<typename T>
-class Iterator {
-public:
-    using iterator_category = std::bidirectional_iterator_tag;
-    using difference_type = size_t;
-    using value_type = T;
-    using pointer = value_type*;
-    using reference = value_type&;
-public:
-    constexpr explicit Iterator() = default;
-    constexpr explicit Iterator(pointer ptr) : ptr(ptr){}
-public:
-    reference operator*(){
-        return *ptr;
-    }
-    Iterator& operator++(){
-        ++ptr;
-        return *this;
-    }
-    Iterator& operator--(){
-        --ptr;
-        return *this;
-    }
-    Iterator& operator+=(size_t n){
-        ptr += n;
-        return *this;
-    }
-    Iterator& operator-=(size_t n){
-        ptr -= n;
-        return *this;
-    }
-    bool operator==(Iterator other){
-        return ptr == other.ptr;
-    }
-    bool operator!=(Iterator other){
-        return ptr != other.ptr;
-    }
-private:
-    pointer ptr;
-};
 
 template<typename T, typename Allocator = std::allocator<T>>
 class vector {
@@ -59,7 +18,8 @@ public:
 public:
     constexpr explicit vector(allocator_type alloc = allocator_type())
     : capacity_(0), size_(0) {}
-    constexpr vector(std::initializer_list<T> il) : size_(il.size()), capacity_(il.size()) {
+    constexpr vector(std::initializer_list<T> il) 
+        : size_(il.size()), capacity_(il.size()) {
         array_ = allocator_traits::allocate(allocator_, capacity_);
         size_t index = 0;
         for (auto it = il.begin(); it != il.end(); ++it, ++index) {
@@ -75,13 +35,13 @@ public:
         return *begin();
     }
     value_type back() const noexcept {
-        return *(end()--);
+        return *(--end());
     }
     void reserve(size_t n){
         if(capacity_ <= n) return;
         T* new_arr = allocator_traits::allocate(allocator_, n);
         for (int i = 0; i < size_; ++i) {
-            allocator_traits::construct(allocator_, new_arr, *(array_ + i));
+            allocator_traits::construct(allocator_, new_arr, array_[i]);
         }
         for (int i = 0; i < size_; ++i) {
             allocator_traits::destroy(allocator_,array_ + i);
@@ -110,22 +70,22 @@ public:
         allocator_traits::destroy(allocator_, array_ + size_);
         resize(size_ - 1);
     }
-    [[nodiscard]] std::size_t capacity() const noexcept {
+    std::size_t capacity() const noexcept {
         return capacity_;
     }
-    [[nodiscard]] std::size_t size() const noexcept {
+    std::size_t size() const noexcept {
         return size_;
     }
-    [[nodiscard]] iterator begin() const {
+    iterator begin() const {
         return iterator(array_);
     }
-    [[nodiscard]] iterator end() const {
+    iterator end() const {
         return iterator(array_ + size_);
     }
-    [[nodiscard]] const_iterator cbegin() const {
+    const_iterator cbegin() const {
         return const_iterator(array_);
     }
-    [[nodiscard]] const_iterator cend() const {
+    const_iterator cend() const {
         return const_iterator(array_ + size_);
     }
 public:

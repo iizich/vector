@@ -1,2 +1,1 @@
-add_library(vector INTERFACE)
-target_include_directories(vector INTERFACE .)
+add_executable(vector main.cpp vector.hpp)
